@@ -1,5 +1,7 @@
 # SnowbaTTle
 
+[![SnowbaTTle title screen](docs/screenshot.jpg)](https://adong.github.io/snowball-fight-tt/)
+
 A snowball fight (打雪仗) starring Teddy and Tommy, in a snowy backyard. It's built with Claude Code from plain JavaScript and Three.js, on the shared Claude Games kit.
 There are no image, model or audio files: the kids are the kit's blocky characters, every texture is painted on a canvas, and every sound is synthesised.
 It's silly, not mean. Hits go SPLAT! in a puff of snow, three in a row gives you a wobbly "brain freeze" for two seconds (and nobody can hit you while you're dizzy), and the winner does their signature move.
