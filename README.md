@@ -9,7 +9,7 @@ Snowball fight! Teddy vs Tommy behind snow forts, or team up against the snowmen
 Press **?** any time (or tap the round **?** button on the left edge) to see the keys. The game waits while you look.
 Tap the language button under it (the A文 icon) to switch between English and 中文; the dashboard and every game remember the choice.
 
-A snowball fight (打雪仗) starring Teddy and Tommy, in a snowy backyard. It's built with Claude Code from plain JavaScript and Three.js, on the shared Claude Games kit.
+A snowball fight starring Teddy and Tommy, in a snowy backyard. It's built with Claude Code from plain JavaScript and Three.js, on the shared Claude Games kit.
 There are no image, model or audio files: the kids are the kit's blocky characters, every texture is painted on a canvas, and every sound is synthesised.
 It's silly, not mean. Hits go SPLAT! in a puff of snow, three in a row gives you a wobbly "brain freeze" for two seconds (and nobody can hit you while you're dizzy), and the winner does their signature move.
 Any time, you can call the other brother in: he runs onto your side, says hi with his signature move, hands you a treat, blocks one hit for you, rebuilds your fort and throws snowballs.
