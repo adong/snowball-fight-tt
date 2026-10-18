@@ -18,8 +18,11 @@
     'SWISH!': ['#ff8a1f', '#ffd400', '#ffffff'], 'BOP!': ['#ffe14d', '#ffffff', '#1f6fe0'], 'THUD!': ['#c58a4a', '#ffd9a0', '#ffffff'],
   };
 
+  // The word is drawn in the current language (Kit.lang); the colours follow the English word.
+  const say = (w) => (window.Kit.lang ? window.Kit.lang.t(w) : w);
   function burstTexture(word) {
-    if (burstCache[word]) return burstCache[word];
+    const shown = say(word);
+    if (burstCache[shown]) return burstCache[shown];
     const [c, g] = G.makeCanvas(256, 256);
     const [outer, inner, text] = STYLE[word] || STYLE['SPLAT!'];
     const star = (r1, r2, n, fill) => {
@@ -39,16 +42,18 @@
     star(86, 54, 10, inner);
     g.translate(128, 132);
     g.rotate(-0.12);
-    const size = word.length > 7 ? 36 : word.length > 5 ? 46 : 56;
+    const wide = /[^\x00-\x7f]/.test(shown) ? 1.7 : 1; // a Chinese character is about as wide as two letters
+    const n = shown.length * wide;
+    const size = n > 7 ? 36 : n > 5 ? 46 : 56;
     g.font = `${size}px ${G.FONT}`;
     g.textAlign = 'center';
     g.textBaseline = 'middle';
     g.lineWidth = 10;
     g.strokeStyle = '#14121f';
-    g.strokeText(word, 0, 0);
+    g.strokeText(shown, 0, 0);
     g.fillStyle = text;
-    g.fillText(word, 0, 0);
-    return (burstCache[word] = G.toTexture(c));
+    g.fillText(shown, 0, 0);
+    return (burstCache[shown] = G.toTexture(c));
   }
 
   function sprite(tex, size, x, y, z, o = {}) {

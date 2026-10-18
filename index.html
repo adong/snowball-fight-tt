@@ -196,7 +196,7 @@
   .budbtn.on { background: conic-gradient(#7dff5a calc(var(--fill) * 360deg), rgba(20, 18, 31, 0.6) 0); border-color: var(--yellow); box-shadow: 0 6px 0 var(--ink), 0 0 24px rgba(255, 212, 0, 0.95); }
   .budbtn.rest img { filter: grayscale(1) brightness(0.8); }
   @media (max-height: 500px) {
-    #stick { width: 120px; height: 120px; }
+    #stick { width: 120px; height: 120px; left: max(62px, env(safe-area-inset-left)); } /* clear of the ? and 中文 / EN buttons */
     #knob { width: 54px; height: 54px; margin: -27px 0 0 -27px; }
     .tb { width: 66px; height: 66px; font-size: 26px; }
     .tb.th { width: 84px; height: 84px; font-size: 34px; }
@@ -285,7 +285,7 @@
   @media (max-height: 640px) { .keys { display: none; } }
   @media (max-height: 470px) {
     .screen { gap: 8px; padding: 8px; touch-action: pan-y; }
-    .tag, .touch-hint { display: none !important; }
+    .tag, .touch-hint, #selHint { display: none !important; }
     .logo .l1 { font-size: 17px; -webkit-text-stroke-width: 3px; }
     .logo .l2, .logo .tt { font-size: 38px; -webkit-text-stroke-width: 3px; }
     .pick { padding: 10px 6px 6px; grid-template-columns: 30px auto 30px; }
@@ -404,6 +404,7 @@
 <script src="kit/roster.js"></script>
 <script src="kit/portraits.js"></script>
 <script src="kit/sound.js"></script>
+<script src="kit/lang.js"></script>
 <script src="kit/help.js"></script>
 <script src="js/title.js"></script>
 <script src="js/engine.js"></script>
@@ -415,5 +416,6 @@
 <script src="js/input.js"></script>
 <script src="js/game.js"></script>
 <script src="js/keys.js"></script>
+<script src="js/zh.js"></script>
 </body>
 </html>

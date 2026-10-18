@@ -3,6 +3,7 @@
 [![SnowbaTTle title screen](docs/screenshot.jpg)](https://adong.github.io/snowball-fight-tt/)
 
 Press **?** any time (or tap the round **?** button on the left edge) to see the keys. The game waits while you look.
+Tap **中文 / EN** under it to switch between English and 中文 (the dashboard and every game remember the choice).
 
 A snowball fight (打雪仗) starring Teddy and Tommy, in a snowy backyard. It's built with Claude Code from plain JavaScript and Three.js, on the shared Claude Games kit.
 There are no image, model or audio files: the kids are the kit's blocky characters, every texture is painted on a canvas, and every sound is synthesised.
@@ -135,6 +136,7 @@ The first runs 200 random 1P / 2P / co-op matches with companions called now and
 ```js
 game.start({ mode: '1p', p1: 'teddy', p2: 'tommy', level: 'easy' })  // jump straight into a match ('1p' | '2p' | 'coop')
 game.step(2)          // advance 2 s and draw (for when the tab's animation is throttled)
+game.ff(10)           // advance 10 s, drawing only the last frame (fast in a hidden browser pane)
 game.buddy(0)         // call player 0's companion
 game.special(0, true) // fire player 0's special now (true = the hold version)
 game.throw(1)         // make player 1 throw
@@ -157,6 +159,8 @@ js/fx.js         snow puffs, fort chunks, comic bursts, splats on the snow, ring
 js/sfx.js        snowy sounds on top of Kit.sound: splat, crunch, scoop, brrr, fizz, whistle, fanfare
 js/input.js      keyboard for two players, touch stick and buttons
 js/game.js       scene, camera, screens, HUD, companions and treats, events, main loop, window.game hooks
+js/keys.js       the keys the ? panel shows (Kit.help)
+js/zh.js         中文: the page, toasts, banners, the ? panel and the words drawn in 3D (Kit.lang)
 tools/soak.js    headless CPU-vs-CPU runner (node)
 kit/             copy of ~/claude-games/kit (python3 ../kit/tools/sync.py .), never edited here
 dist/snowball-fight-tt.html   the single-page build

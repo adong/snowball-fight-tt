@@ -184,7 +184,7 @@
     body.root.scale.setScalar(scale);
     scene.add(body.root);
     const v = { who, body, scale, yaw: who.side === 0 ? -PI / 2 : PI / 2, ph: 0, stepT: 0, puffT: 0, splatT: 0, held: null, poseT: 0 };
-    v.tag = Kit.gfx.nameTag(o.label || who.name, o.tagColor || SIDE[who.side].light);
+    v.tag = Kit.gfx.nameTag(Kit.lang.t(o.label || who.name), o.tagColor || SIDE[who.side].light);
     v.tag.scale.multiplyScalar(o.tagScale || 1);
     scene.add(v.tag);
     v.tagY = (who.char === 'snowman' ? 2.55 : 2.6) * scale + 0.05;
@@ -535,7 +535,8 @@
 
   const iconCache = {};
   function pickupTexture(kind) {
-    if (iconCache[kind]) return iconCache[kind];
+    const key = kind + Kit.lang.get();
+    if (iconCache[key]) return iconCache[key];
     const [c, g] = Kit.gfx.makeCanvas(128, 128);
     const gr = g.createRadialGradient(64, 54, 8, 64, 64, 60);
     gr.addColorStop(0, '#ffffff');
@@ -558,7 +559,7 @@
       g.stroke();
       g.font = `30px ${Kit.gfx.FONT}`;
       g.fillStyle = '#1f4fe0';
-      g.fillText('BIG', 64, 68);
+      g.fillText(Kit.lang.t('BIG'), 64, 68);
     } else if (kind === 'shovel') {
       g.save();
       g.translate(64, 64);
@@ -577,7 +578,15 @@
       g.font = `70px ${Kit.gfx.EMOJI_FONT}`;
       g.fillText(kind === 'cocoa' ? '☕' : '✌️', 64, 70);
     }
-    return (iconCache[kind] = Kit.gfx.toTexture(c));
+    return (iconCache[key] = Kit.gfx.toTexture(c));
+  }
+
+  // Switching language: name tags and power-up icons are drawn on canvases, so build them again.
+  function relabel() {
+    for (const map of [vis.players, vis.buds, vis.pickups]) {
+      for (const v of map.values()) removeVis(v);
+      map.clear();
+    }
   }
 
   function syncPickup(u) {
@@ -1273,7 +1282,7 @@
 
   // ---------------------------------------------------------------- the loop
 
-  function frame(dt) {
+  function frame(dt, draw = true) {
     if (resize() && G.screen === 'fight') placeToasts();
     G.time += dt;
     for (let i = G.timers.length - 1; i >= 0; i--) {
@@ -1304,7 +1313,7 @@
     FX.update(dt);
     updateCamera(dt);
     updateHud();
-    renderer.render(scene, camera);
+    if (draw) renderer.render(scene, camera);
   }
 
   let last = 0;
@@ -1351,6 +1360,7 @@
     portraits.snowman = snowmanPortrait();
     $('logo').innerHTML = window.SB_TITLE_HTML;
     I.bindTouch($('stick'), $('knob'), [...document.querySelectorAll('#touch [data-act]')], $('tBud'));
+    Kit.lang.onChange(relabel);
     bindMenus();
     $('muteBtn').textContent = Kit.sound.isMuted() ? '🔇' : '🔊';
     goTitle();
@@ -1370,6 +1380,13 @@
       return this.state();
     },
     // start a match straight away: { mode: '1p' | '2p' | 'coop', p1, p2, level }
+    // the same, drawing only the last frame (fast in a hidden or software-rendered browser)
+    ff(seconds = 1) {
+      hooks();
+      const n = Math.max(1, Math.round(seconds * 60));
+      for (let i = 0; i < n; i++) frame(1 / 60, i === n - 1);
+      return this.state();
+    },
     start(o = {}) {
       hooks();
       Kit.sound.init();
