@@ -97,12 +97,13 @@
   let lastW = 0, lastH = 0;
   function resize() {
     const w = window.innerWidth, h = window.innerHeight;
-    if (w === lastW && h === lastH) return;
+    if (w === lastW && h === lastH) return false;
     lastW = w;
     lastH = h;
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
+    return true;
   }
 
   // The whole yard (x ±11) must fit across the screen; narrow screens pull the camera back.
@@ -203,13 +204,13 @@
       v.dizzy = new T.Group();
       ['❄️', '⭐', '❄️', '⭐', '💫'].forEach((e, i) => {
         const s = new T.Sprite(new T.SpriteMaterial({ map: Kit.gfx.emojiTexture(e), depthWrite: false }));
-        s.scale.set(0.38, 0.38, 1);
+        s.scale.set(0.46, 0.46, 1);
         s.userData.a = (i / 5) * PI * 2;
         v.dizzy.add(s);
       });
       const brr = new T.Sprite(new T.SpriteMaterial({ map: Kit.gfx.emojiTexture('🥶'), depthWrite: false }));
       brr.scale.set(0.7, 0.7, 1);
-      brr.position.y = 0.75;
+      brr.position.y = 0.95;
       v.dizzy.add(brr);
       v.dizzy.visible = false;
       scene.add(v.dizzy);
@@ -311,8 +312,10 @@
     if (tgt && (p.throwT > 0 || p.charging || p.state === 'special' || !p.moving)) want = yawFor(tgt.x - p.x, tgt.z - p.z) + (p.side === 0 ? -0.25 : 0.25);
     else if (p.moving) want = yawFor(p.vx, p.vz);
     if (p.state === 'celebrate' || p.state === 'sad') want = yawFor(0, 1) + (p.side === 0 ? -0.4 : 0.4);
+    // Tommy's Y pose is for the camera, like a photo, before the ✌️ spread flies
+    if (p.state === 'special' && p.spec && p.spec.def.pose === 'peace' && p.spec.t < p.spec.def.wind + 0.1) want = yawFor(0, 1) + (p.side === 0 ? -0.3 : 0.3);
     if (p.state === 'dizzy') want = v.yaw + dt * 2.5;
-    turnTo(v, want, dt);
+    turnTo(v, want, dt, p.state === 'special' ? 20 : 12);
     const sp = Math.hypot(p.vx, p.vz);
     v.ph += dt * (sp > 0.3 ? 2.6 * sp : 0);
     let mode = 'ready', o = { t: 0 };
@@ -794,10 +797,11 @@
         break;
       case 'special':
         if (p) {
+          // effects go above and behind, so the Y pose and the giant snowball overhead stay in sight
           if (e.key.startsWith('peace')) {
-            FX.word(p.x, 2.9, p.z, 'PEACE!', true);
-            for (let i = 0; i < 6; i++) FX.emoji(i % 2 ? '⭐' : '✌️', p.x + Math.cos(i) * 0.8, 2.2 + (i % 3) * 0.3, p.z + Math.sin(i) * 0.8, { size: 0.5, life: 1, vy: 1.4 });
-          } else FX.emoji(e.icon, p.x, 2.9, p.z, { size: 1.0, life: 1.0 });
+            FX.word(p.x - p.face * 0.6, 3.7, p.z - 0.3, 'PEACE!');
+            for (let i = 0; i < 6; i++) FX.emoji(i % 2 ? '⭐' : '✌️', p.x + Math.cos(i) * 1.1, 2.4 + (i % 3) * 0.3, p.z + Math.sin(i) * 0.9, { size: 0.5, life: 1, vy: 1.4 });
+          } else FX.emoji(e.icon, p.x - p.face * 1.1, 3.0, p.z - 0.2, { size: 1.0, life: 1.0 });
         }
         if (fight && p) {
           S.special();
@@ -863,9 +867,12 @@
       case 'timeWarn':
         if (fight) toast('⏰ 10 SECONDS LEFT!', 'hint');
         break;
+      case 'melt':
+        FX.puff(e.x, e.y, e.z, { n: 6, speed: 1.2, size: 0.3, color: '#dff3ff', up: 1.5 });
+        break;
       case 'sudden':
         if (fight) {
-          banner('NEXT HIT WINS!', 'warn', 1.6);
+          banner('NEXT HIT WINS!', 'warn', 1.8, 'THE FORTS ARE MELTING!');
           S.whistle();
         }
         break;
@@ -986,11 +993,17 @@
       }
     }
     $('toWin').textContent = `FIRST TO ${E.TUNE.toWin} HITS · BEST OF 3`;
+    placeToasts();
     // the big touch button calls player 1's companion
     const p1 = M.players.find((p) => p.human && p.ctrl === 0);
     if (p1 && p1.buddyChar) $('tBud').querySelector('img').src = portrait(p1.buddyChar);
     $('tBud').querySelector('small').textContent = p1 && p1.buddyChar ? charName(p1.buddyChar) : 'BROTHER';
     showTouch();
+  }
+
+  // Toasts go just under the scoreboard, which is taller when a side has two or three players.
+  function placeToasts() {
+    $('toasts').style.top = Math.round($('board').getBoundingClientRect().bottom + 10) + 'px';
   }
 
   function setVar(el, name, v, cache, key) {
@@ -1101,6 +1114,7 @@
     G.picks = (G.picks || ['teddy', 'tommy']).slice(0, 2);
     if (!ROSTER.includes(G.picks[0])) G.picks[0] = 'teddy';
     if (!ROSTER.includes(G.picks[1])) G.picks[1] = 'tommy';
+    if (!M || M.mode !== 'demo') startDemo();
     setScreen('select');
     refreshSelect();
   }
@@ -1260,7 +1274,7 @@
   // ---------------------------------------------------------------- the loop
 
   function frame(dt) {
-    resize();
+    if (resize() && G.screen === 'fight') placeToasts();
     G.time += dt;
     for (let i = G.timers.length - 1; i >= 0; i--) {
       const t = G.timers[i];

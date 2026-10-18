@@ -28,10 +28,10 @@
     ballR: 0.13, giantR: 0.42,
     hitStun: 0.35, dizzy: 2.0, dizzyGrace: 0.8, streakFor: 3, streakTime: 5,
     meterHit: 0.25, meterTaken: 0.08,
-    toWin: 10, roundsToWin: 2, roundTime: 90, intro: 2.4, outro: 3.4,
+    toWin: 10, roundsToWin: 2, roundTime: 90, intro: 2.4, outro: 3.4, meltEvery: 1.5,
     dropFirst: 6, dropEvery: [8, 11], dropLife: 14,
     cocoa: 8, triple: 3,
-    buddyLife: 10, buddyLife2p: 8, buddyRest2p: 18, buddyThrow: 1.8, treatGap: 1.5, buddySpeed: 4.8,
+    buddyLife: 10, buddyLife2p: 8, buddyRest2p: 18, buddyThrow: 2.6, treatGap: 1.5, buddySpeed: 4.8,
   };
 
   const A = { halfW: 10.4, halfD: 4.5, mid: 0.75 }; // the yard; nobody gets closer than `mid` to the line
@@ -50,8 +50,8 @@
   const SPECIALS = {
     boxing: { name: 'BOXING FLURRY', icon: '🥊', pose: 'boxing', wind: 0.15, shots: 3, gap: 0.2 },
     jumpshot: { name: 'JUMP SHOT SLAM', icon: '🏀', pose: 'jumpshot', wind: 0.45, jump: 1.6, giant: true, lob: true, slam: true },
-    peace: { name: 'PEACE SPREAD', icon: '✌️', pose: 'peace', wind: 0.6, shots: 2, gap: 0.3, spread: 5, fan: 0.14 },
-    peaceRain: { name: 'PEACE RAIN', icon: '✌️', pose: 'peace', wind: 0.6, shots: 2, gap: 0.3, spread: 5, fan: 0.95, lob: true },
+    peace: { name: 'PEACE SPREAD', icon: '✌️', pose: 'peace', wind: 0.6, shots: 2, gap: 0.3, spread: 5, fan: 0.1 },
+    peaceRain: { name: 'PEACE RAIN', icon: '✌️', pose: 'peace', wind: 0.6, shots: 2, gap: 0.3, spread: 5, fan: 0.85, lob: true },
     flurry: { name: 'ZOOM FLURRY', icon: '💨', pose: 'boxing', wind: 0.1, shots: 4, gap: 0.14 },
     moon: { name: 'MOON RAIN', icon: '🌙', pose: 'jumpshot', wind: 0.4, shots: 2, gap: 0.3, spread: 3, fan: 0.9, lob: true },
     cannon: { name: 'SNOW CANNON', icon: '⚡', pose: 'straight', wind: 0.35, shots: 2, gap: 0.35, giant: true },
@@ -163,6 +163,7 @@
     m.score = [0, 0];
     m.timeLeft = TUNE.roundTime;
     m.sudden = false;
+    m.meltT = 0;
     m.roundWinner = -1;
     m.balls.length = 0;
     m.pickups.length = 0;
@@ -222,6 +223,7 @@
           m.events.push({ type: 'sudden' });
         }
       }
+      if (m.sudden) melt(m, dt);
       updateDrops(m, dt);
     } else if (m.phase === 'outro') {
       m.phaseT -= dt;
@@ -714,6 +716,17 @@
     m.events.push({ type: 'roundEnd', side, reason, score: m.score.slice(), last: m.rounds[side] >= TUNE.roundsToWin });
   }
 
+  // Sudden death: the forts melt a brick at a time, so nobody can hide until the snow comes back.
+  function melt(m, dt) {
+    if ((m.meltT = (m.meltT || 0) - dt) > 0) return;
+    m.meltT = TUNE.meltEvery;
+    const standing = m.segs.filter((s) => s.lvl > 0);
+    if (!standing.length) return;
+    const s = standing[Math.floor(Math.random() * standing.length)];
+    s.lvl--;
+    m.events.push({ type: 'melt', seg: s.id, lvl: s.lvl, x: s.x, y: LVL_H[s.lvl] + 0.2, z: s.zc });
+  }
+
   // ---------------------------------------------------------------- power-ups
 
   function updateDrops(m, dt) {
@@ -899,7 +912,7 @@
         const t = pickTarget(m, u);
         if (t && t.state !== 'dizzy') {
           const lob = !!lineBlocked(m, u, t);
-          spawnBall(m, p, u, t, { lob, lead: 0.3, err: 0.6 });
+          spawnBall(m, p, u, t, { lob, lead: 0.3, err: 0.8 });
           u.throwT = 0.36;
           m.events.push({ type: 'buddyThrow', bud: u.id, lob });
         }

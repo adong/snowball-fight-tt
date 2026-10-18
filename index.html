@@ -124,7 +124,7 @@
   #rw0 { text-align: right; }
   #clock { font: 800 15px/1 'Rubik', sans-serif; padding: 3px 8px; border-radius: 8px; background: rgba(20, 18, 31, 0.6); font-variant-numeric: tabular-nums; }
   #clock.warn { background: var(--red); animation: pulse 0.5s ease-in-out infinite; }
-  #toWin { margin-top: 5px; font: 800 10px/1 'Rubik', sans-serif; letter-spacing: 1.5px; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8); }
+  #toWin { margin-top: 5px; font: 800 10px/1 'Rubik', sans-serif; letter-spacing: 1.5px; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8); white-space: nowrap; }
   .ibtns { display: flex; gap: 6px; margin-top: 6px; pointer-events: auto; }
   .ibtn {
     width: 34px; height: 34px; border-radius: 10px; font-size: 14px; line-height: 1;
@@ -209,7 +209,7 @@
     .info { min-width: 80px; }
     .meter { width: 72px; }
     .bud .ring { width: 30px; height: 30px; }
-    #toasts { top: 104px; }
+    #toWin { letter-spacing: 0.5px; font-size: 9px; }
   }
 
   /* ---------- screens ---------- */
