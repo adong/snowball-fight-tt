@@ -2,6 +2,10 @@
 
 [![SnowbaTTle title screen](docs/screenshot.jpg)](https://adong.github.io/snowball-fight-tt/)
 
+Snowball fight! Teddy vs Tommy behind snow forts, or team up against the snowmen. 1 or 2 players.
+
+**中文：** 打雪仗：Teddy 对 Tommy 躲在雪堡后面，或者组队打雪人。单人或双人。
+
 Press **?** any time (or tap the round **?** button on the left edge) to see the keys. The game waits while you look.
 Tap the language button under it (the A文 icon) to switch between English and 中文; the dashboard and every game remember the choice.
 
@@ -10,7 +14,7 @@ There are no image, model or audio files: the kids are the kit's blocky characte
 It's silly, not mean. Hits go SPLAT! in a puff of snow, three in a row gives you a wobbly "brain freeze" for two seconds (and nobody can hit you while you're dizzy), and the winner does their signature move.
 Any time, you can call the other brother in: he runs onto your side, says hi with his signature move, hands you a treat, blocks one hit for you, rebuilds your fort and throws snowballs.
 
-"SnowbaTTle" is a working title. It lives in one place, `js/title.js`.
+The name lives in one place, `js/title.js`.
 
 ## Play
 
